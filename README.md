@@ -1,28 +1,51 @@
-# IPC-prediction
-**Gem5-Mimic Machine Learning Project**
+# Improving ML-based IPC Prediction with Ratio-Based Features
 
-Overview:
-This GitHub repository contains a project that uses machine learning models to mimic Gem5 simulation results and predict instructions per cycle (IPC).
-Gem5 is a popular computer architecture simulator, and this project aims to predict IPC values based on various statistics extracted from Gem5 simulations.
+ECE228 Final Project
 
-Features:
-      Utilizes machine learning models, including Random Forest, Linear Regression, and Neural Networks, to predict IPC values.
-      Generates a CSV file from Gem5's stats.txt output to use as input data for training and testing the models.
-      Collects various statistics from Gem5, including:
-                        numLoadInsts
-                        numStoreInsts
-                        numInsts
-                        numBranches
-                        intAluAccesses
-                        numOps
-                        model (other optional statistics can be added)
-      
-Evaluation:
-      Evaluate the model's performance and analyze the predictions.
+## Overview
 
-Model Performance:
-      Provide information on the performance of your machine learning models, such as accuracy, mean squared error, or any other relevant metrics.
+This project reproduces the Random Forest IPC prediction framework proposed in:
 
+"Accelerating Computer Architecture Simulation through Machine Learning"
+
+and extends it with ratio-based feature engineering to investigate model adaptability.
+
+## Contributions
+
+* Reproduced the original Random Forest IPC prediction framework.
+* Evaluated prediction performance using RMSE, MAE, and R².
+* Introduced ratio-based workload-normalized features.
+* Performed adaptability stress testing.
+* Improved RMSE from 0.0666 to 0.0540.
+* Improved R² from 0.9244 to 0.9504.
+
+## Repository Structure
+
+* reproduce_paper_random_forest.py
+  Reproduces the original Random Forest model.
+
+* stress_test_ratio_features.py
+  Implements ratio-based feature engineering and adaptability evaluation.
+
+* results/
+  Generated figures and evaluation results.
+
+* report/
+  Final report and presentation slides.
+
+## Main Results
+
+| Model            | RMSE   | R²     |
+| ---------------- | ------ | ------ |
+| Raw Feature RF   | 0.0666 | 0.9244 |
+| Ratio Feature RF | 0.0540 | 0.9504 |
+
+## Authors
+
+Haoyue Zhang
+Zhiyuan Yao
+
+UC San Diego ECE228 Final Project
 
 
 

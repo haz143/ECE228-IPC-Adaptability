@@ -1,4 +1,5 @@
-import os
+from pathlib import Path
+
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -6,10 +7,12 @@ import matplotlib.pyplot as plt
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
 
-os.makedirs("stress_test_results", exist_ok=True)
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+OUTPUT_DIR = PROJECT_ROOT / "ratio_feature_random_forest_results"
+OUTPUT_DIR.mkdir(exist_ok=True)
 
-train_df = pd.read_csv("training_data.csv")
-test_df = pd.read_csv("testing_data.csv")
+train_df = pd.read_csv(PROJECT_ROOT / "training_data.csv")
+test_df = pd.read_csv(PROJECT_ROOT / "testing_data.csv")
 
 raw_features = [
     "numLoadInsts",
@@ -88,10 +91,7 @@ def evaluate_model(name, model, X_train, y_train, X_test, y_test, output_prefix)
         "Residual": residuals
     })
 
-    prediction_df.to_csv(
-        f"stress_test_results/{output_prefix}_predictions.csv",
-        index=False
-    )
+    prediction_df.to_csv(OUTPUT_DIR / f"{output_prefix}_predictions.csv", index=False)
 
     plt.figure(figsize=(6, 5))
     plt.scatter(y_test, pred, alpha=0.7)
@@ -100,10 +100,7 @@ def evaluate_model(name, model, X_train, y_train, X_test, y_test, output_prefix)
     plt.title(f"Actual vs Predicted IPC - {name}")
     plt.grid(True)
     plt.tight_layout()
-    plt.savefig(
-        f"stress_test_results/{output_prefix}_actual_vs_predicted.png",
-        dpi=300
-    )
+    plt.savefig(OUTPUT_DIR / f"{output_prefix}_actual_vs_predicted.png", dpi=300)
     plt.close()
 
     plt.figure(figsize=(6, 5))
@@ -114,10 +111,7 @@ def evaluate_model(name, model, X_train, y_train, X_test, y_test, output_prefix)
     plt.title(f"Residual Analysis - {name}")
     plt.grid(True)
     plt.tight_layout()
-    plt.savefig(
-        f"stress_test_results/{output_prefix}_residuals.png",
-        dpi=300
-    )
+    plt.savefig(OUTPUT_DIR / f"{output_prefix}_residuals.png", dpi=300)
     plt.close()
 
     return {
@@ -158,7 +152,7 @@ raw_result, raw_model = evaluate_model(
 )
 
 ratio_result, ratio_model = evaluate_model(
-    "Stress-Test Ratio-Feature Random Forest",
+    "Ratio-Feature Random Forest",
     rf_ratio,
     X_train_ratio,
     y_train,
@@ -168,7 +162,7 @@ ratio_result, ratio_model = evaluate_model(
 )
 
 summary = pd.DataFrame([raw_result, ratio_result])
-summary.to_csv("stress_test_results/stress_test_summary.csv", index=False)
+summary.to_csv(OUTPUT_DIR / "ratio_feature_random_forest_summary.csv", index=False)
 
 print("\nSummary:")
 print(summary)
@@ -179,7 +173,7 @@ plt.ylabel("RMSE")
 plt.title("Raw Features vs Ratio Features")
 plt.xticks(rotation=20, ha="right")
 plt.tight_layout()
-plt.savefig("stress_test_results/raw_vs_ratio_rmse.png", dpi=300)
+plt.savefig(OUTPUT_DIR / "raw_vs_ratio_rmse.png", dpi=300)
 plt.close()
 
 ratio_importance = pd.DataFrame({
@@ -187,10 +181,7 @@ ratio_importance = pd.DataFrame({
     "Importance": ratio_model.feature_importances_
 }).sort_values("Importance", ascending=False)
 
-ratio_importance.to_csv(
-    "stress_test_results/ratio_feature_importance.csv",
-    index=False
-)
+ratio_importance.to_csv(OUTPUT_DIR / "ratio_feature_importance.csv", index=False)
 
 plt.figure(figsize=(9, 5))
 plt.bar(ratio_importance["Feature"], ratio_importance["Importance"])
@@ -199,7 +190,7 @@ plt.ylabel("Feature Importance")
 plt.title("Feature Importance of Ratio-Based Random Forest")
 plt.xticks(rotation=35, ha="right")
 plt.tight_layout()
-plt.savefig("stress_test_results/ratio_feature_importance.png", dpi=300)
+plt.savefig(OUTPUT_DIR / "ratio_feature_importance.png", dpi=300)
 plt.close()
 
-print("\nSaved all stress-test results to stress_test_results/")
+print(f"\nSaved all ratio-feature Random Forest results to {OUTPUT_DIR}/")

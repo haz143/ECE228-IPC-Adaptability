@@ -1,4 +1,5 @@
-import os
+from pathlib import Path
+
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -6,10 +7,12 @@ import matplotlib.pyplot as plt
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
 
-os.makedirs("paper_reproduction_results", exist_ok=True)
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+OUTPUT_DIR = PROJECT_ROOT / "paper_reproduction_results"
+OUTPUT_DIR.mkdir(exist_ok=True)
 
-train_df = pd.read_csv("training_data.csv")
-test_df = pd.read_csv("testing_data.csv")
+train_df = pd.read_csv(PROJECT_ROOT / "training_data.csv")
+test_df = pd.read_csv(PROJECT_ROOT / "testing_data.csv")
 
 features = [
     "numLoadInsts",
@@ -55,14 +58,14 @@ results = pd.DataFrame({
     "Residual": y_pred - y_test
 })
 
-results.to_csv("paper_reproduction_results/prediction_results.csv", index=False)
+results.to_csv(OUTPUT_DIR / "prediction_results.csv", index=False)
 
 metrics = pd.DataFrame({
     "Metric": ["RMSE", "MAE", "R2"],
     "Value": [rmse, mae, r2]
 })
 
-metrics.to_csv("paper_reproduction_results/metrics.csv", index=False)
+metrics.to_csv(OUTPUT_DIR / "metrics.csv", index=False)
 
 # Figure 1: Actual vs Predicted IPC
 plt.figure(figsize=(6, 5))
@@ -72,7 +75,7 @@ plt.ylabel("Predicted IPC")
 plt.title("Actual vs. Predicted IPC")
 plt.grid(True)
 plt.tight_layout()
-plt.savefig("paper_reproduction_results/figure1_actual_vs_predicted_ipc.png", dpi=300)
+plt.savefig(OUTPUT_DIR / "figure1_actual_vs_predicted_ipc.png", dpi=300)
 plt.close()
 
 # Figure 3: Residuals vs Predicted Values
@@ -86,7 +89,7 @@ plt.ylabel("Residuals")
 plt.title("Residuals vs. Predicted Values")
 plt.grid(True)
 plt.tight_layout()
-plt.savefig("paper_reproduction_results/figure3_residuals_vs_predicted.png", dpi=300)
+plt.savefig(OUTPUT_DIR / "figure3_residuals_vs_predicted.png", dpi=300)
 plt.close()
 
 # Residual histogram
@@ -98,7 +101,7 @@ plt.ylabel("Frequency")
 plt.title("Histogram of Residuals")
 plt.grid(True)
 plt.tight_layout()
-plt.savefig("paper_reproduction_results/figure3_residual_histogram.png", dpi=300)
+plt.savefig(OUTPUT_DIR / "figure3_residual_histogram.png", dpi=300)
 plt.close()
 
 # Figure 5: Feature Importance
@@ -109,7 +112,7 @@ importance_df = pd.DataFrame({
     "Importance": importance
 }).sort_values("Importance", ascending=False)
 
-importance_df.to_csv("paper_reproduction_results/feature_importance.csv", index=False)
+importance_df.to_csv(OUTPUT_DIR / "feature_importance.csv", index=False)
 
 plt.figure(figsize=(9, 5))
 plt.bar(importance_df["Feature"], importance_df["Importance"])
@@ -118,7 +121,7 @@ plt.ylabel("Feature Importance")
 plt.title("Feature Importance for IPC Prediction")
 plt.xticks(rotation=35, ha="right")
 plt.tight_layout()
-plt.savefig("paper_reproduction_results/figure5_feature_importance.png", dpi=300)
+plt.savefig(OUTPUT_DIR / "figure5_feature_importance.png", dpi=300)
 plt.close()
 
 # Normalized version: normalize instruction-related features by numInsts
@@ -163,7 +166,7 @@ norm_results = pd.DataFrame({
     "Residual_Normalized": y_pred_norm - y_test
 })
 
-norm_results.to_csv("paper_reproduction_results/normalized_prediction_results.csv", index=False)
+norm_results.to_csv(OUTPUT_DIR / "normalized_prediction_results.csv", index=False)
 
 plt.figure(figsize=(6, 5))
 plt.scatter(y_test, y_pred_norm, alpha=0.7)
@@ -172,7 +175,7 @@ plt.ylabel("Predicted IPC")
 plt.title("Actual vs. Predicted IPC Values")
 plt.grid(True)
 plt.tight_layout()
-plt.savefig("paper_reproduction_results/figure2_normalized_actual_vs_predicted.png", dpi=300)
+plt.savefig(OUTPUT_DIR / "figure2_normalized_actual_vs_predicted.png", dpi=300)
 plt.close()
 
 residuals_norm = y_pred_norm - y_test
@@ -185,7 +188,7 @@ plt.ylabel("Residuals")
 plt.title("Residuals vs. Predicted Values")
 plt.grid(True)
 plt.tight_layout()
-plt.savefig("paper_reproduction_results/figure4_normalized_residuals_vs_predicted.png", dpi=300)
+plt.savefig(OUTPUT_DIR / "figure4_normalized_residuals_vs_predicted.png", dpi=300)
 plt.close()
 
 plt.figure(figsize=(6, 5))
@@ -196,7 +199,7 @@ plt.ylabel("Frequency")
 plt.title("Histogram of Residuals")
 plt.grid(True)
 plt.tight_layout()
-plt.savefig("paper_reproduction_results/figure4_normalized_residual_histogram.png", dpi=300)
+plt.savefig(OUTPUT_DIR / "figure4_normalized_residual_histogram.png", dpi=300)
 plt.close()
 
 summary = pd.DataFrame({
@@ -206,6 +209,6 @@ summary = pd.DataFrame({
     "R2": [r2, r2_norm]
 })
 
-summary.to_csv("paper_reproduction_results/reproduction_summary.csv", index=False)
+summary.to_csv(OUTPUT_DIR / "reproduction_summary.csv", index=False)
 
-print("\nSaved all reproduction results to paper_reproduction_results/")
+print(f"\nSaved all reproduction results to {OUTPUT_DIR}/")
